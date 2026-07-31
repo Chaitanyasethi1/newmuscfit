@@ -1,25 +1,13 @@
 import { useState, useEffect } from "react"
 import { Warp } from "@paper-design/shaders-react"
 
+// Target date: August 30, 2026 at 22:45:00 UTC (30 days from launch)
+const TARGET_TIMESTAMP = new Date("2026-08-30T22:45:00Z").getTime();
+
 export default function NewsLetter() {
-  const storageKey = "countdown_target_date";
-
   const getInitialTimeLeft = () => {
-    if (typeof window === "undefined") {
-      return { days: 30, hours: 0, minutes: 0, seconds: 0 };
-    }
-    
-    let targetTime = localStorage.getItem(storageKey);
-    if (!targetTime) {
-      const targetDate = new Date();
-      targetDate.setDate(targetDate.getDate() + 30);
-      targetTime = targetDate.getTime().toString();
-      localStorage.setItem(storageKey, targetTime);
-    }
-
-    const targetTimestamp = parseInt(targetTime, 10);
     const now = Date.now();
-    const difference = targetTimestamp - now;
+    const difference = TARGET_TIMESTAMP - now;
 
     if (difference <= 0) {
       return { days: 0, hours: 0, minutes: 0, seconds: 0 };
@@ -36,18 +24,9 @@ export default function NewsLetter() {
   const [timeLeft, setTimeLeft] = useState(getInitialTimeLeft);
 
   useEffect(() => {
-    let targetTime = localStorage.getItem(storageKey);
-    if (!targetTime) {
-      const targetDate = new Date();
-      targetDate.setDate(targetDate.getDate() + 30);
-      targetTime = targetDate.getTime().toString();
-      localStorage.setItem(storageKey, targetTime);
-    }
-    const targetTimestamp = parseInt(targetTime, 10);
-
     const updateTimer = () => {
       const now = Date.now();
-      const difference = targetTimestamp - now;
+      const difference = TARGET_TIMESTAMP - now;
 
       if (difference <= 0) {
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
