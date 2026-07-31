@@ -1,10 +1,17 @@
 import { useState, useEffect } from "react"
 import { Warp } from "@paper-design/shaders-react"
+import { supabase } from "../../lib/supabaseClient"
 
 // Target date: August 30, 2026 at 22:45:00 UTC (30 days from launch)
 const TARGET_TIMESTAMP = new Date("2026-08-30T22:45:00Z").getTime();
 
 export default function NewsLetter() {
+  const [email, setEmail] = useState("");
+  const [mensWear, setMensWear] = useState(false);
+  const [womensWear, setWomensWear] = useState(false);
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [message, setMessage] = useState("");
+
   const getInitialTimeLeft = () => {
     const now = Date.now();
     const difference = TARGET_TIMESTAMP - now;
@@ -54,6 +61,50 @@ export default function NewsLetter() {
 
     return () => clearInterval(interval);
   }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) {
+      setStatus("error");
+      setMessage("Please enter a valid email address.");
+      return;
+    }
+
+    setStatus("loading");
+    setMessage("");
+
+    try {
+      const { error } = await supabase
+        .from("subscribers")
+        .insert([
+          {
+            email,
+            preferences: {
+              mens_wear: mensWear,
+              womens_wear: womensWear,
+            },
+          },
+        ]);
+
+      if (error) {
+        if (error.code === "23505") { // Unique violation
+          setStatus("success");
+          setMessage("You're already subscribed! We will keep you updated.");
+        } else {
+          throw error;
+        }
+      } else {
+        setStatus("success");
+        setMessage("Thank you! You've been subscribed successfully.");
+        setEmail("");
+        setMensWear(false);
+        setWomensWear(false);
+      }
+    } catch (err: any) {
+      setStatus("error");
+      setMessage(err.message || "Something went wrong. Please try again.");
+    }
+  };
 
   return (
     <main className="relative min-h-[100dvh] overflow-hidden">
@@ -110,37 +161,70 @@ export default function NewsLetter() {
           </div>
 
           {/* Email input with submit button */}
-          <div className="space-y-4 max-w-lg mx-auto">
+          <form onSubmit={handleSubmit} className="space-y-4 max-w-lg mx-auto">
             <div className="relative">
               <input
                 type="email"
-                placeholder="Enter your email for early access"
-                className="w-full px-5 py-3.5 pr-16 text-sm md:text-lg bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white/40 transition-all duration-300"
+                required
+                disabled={status === "loading"}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder={status === "loading" ? "Submitting..." : "Enter your email for early access"}
+                className="w-full px-5 py-3.5 pr-16 text-sm md:text-lg bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white/40 transition-all duration-300 disabled:opacity-50"
               />
-              <button className="absolute right-1.5 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300 group">
-                <svg
-                  className="w-4 h-4 md:w-5 md:h-5 text-black group-hover:translate-x-0.5 transition-transform duration-300"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
-                </svg>
+              <button 
+                type="submit"
+                disabled={status === "loading"}
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300 group disabled:opacity-50"
+              >
+                {status === "loading" ? (
+                  <div className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div>
+                ) : (
+                  <svg
+                    className="w-4 h-4 md:w-5 md:h-5 text-black group-hover:translate-x-0.5 transition-transform duration-300"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                  </svg>
+                )}
               </button>
             </div>
 
             {/* Wear preferences for gym wear */}
             <div className="flex flex-col sm:flex-row justify-center items-center gap-y-2.5 sm:gap-y-0 sm:gap-x-6 text-xs text-white/60">
               <label className="flex items-center gap-2 cursor-pointer hover:text-white transition-colors duration-200">
-                <input type="checkbox" className="w-4 h-4 rounded border-white/20 bg-white/5 accent-white cursor-pointer" />
+                <input 
+                  type="checkbox" 
+                  disabled={status === "loading"}
+                  checked={mensWear}
+                  onChange={(e) => setMensWear(e.target.checked)}
+                  className="w-4 h-4 rounded border-white/20 bg-white/5 accent-white cursor-pointer" 
+                />
                 <span>Notify me for Men's Wear</span>
               </label>
               <label className="flex items-center gap-2 cursor-pointer hover:text-white transition-colors duration-200">
-                <input type="checkbox" className="w-4 h-4 rounded border-white/20 bg-white/5 accent-white cursor-pointer" />
+                <input 
+                  type="checkbox" 
+                  disabled={status === "loading"}
+                  checked={womensWear}
+                  onChange={(e) => setWomensWear(e.target.checked)}
+                  className="w-4 h-4 rounded border-white/20 bg-white/5 accent-white cursor-pointer" 
+                />
                 <span>Notify me for Women's Wear</span>
               </label>
             </div>
-          </div>
+
+            {/* Status Feedback Message */}
+            {message && (
+              <p className={`text-xs md:text-sm font-medium tracking-wide mt-2 animate-fade-in ${
+                status === "success" ? "text-emerald-400" : "text-rose-400"
+              }`}>
+                {message}
+              </p>
+            )}
+          </form>
 
           {/* Description text */}
           <p className="text-white/70 text-sm md:text-lg font-sans font-light leading-relaxed max-w-lg mx-auto">
