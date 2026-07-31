@@ -2,17 +2,14 @@ import { useState, useEffect } from "react"
 import { Warp } from "@paper-design/shaders-react"
 
 export default function NewsLetter() {
-  const [timeLeft, setTimeLeft] = useState({
-    days: 30,
-    hours: 0,
-    minutes: 0,
-    seconds: 0
-  })
+  const storageKey = "countdown_target_date";
 
-  useEffect(() => {
-    const storageKey = "countdown_target_date";
-    let targetTime = localStorage.getItem(storageKey);
+  const getInitialTimeLeft = () => {
+    if (typeof window === "undefined") {
+      return { days: 30, hours: 0, minutes: 0, seconds: 0 };
+    }
     
+    let targetTime = localStorage.getItem(storageKey);
     if (!targetTime) {
       const targetDate = new Date();
       targetDate.setDate(targetDate.getDate() + 30);
@@ -21,20 +18,58 @@ export default function NewsLetter() {
     }
 
     const targetTimestamp = parseInt(targetTime, 10);
+    const now = Date.now();
+    const difference = targetTimestamp - now;
 
-    const interval = setInterval(() => {
-      const now = new Date().getTime();
+    if (difference <= 0) {
+      return { days: 0, hours: 0, minutes: 0, seconds: 0 };
+    }
+
+    return {
+      days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+      hours: Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+      minutes: Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60)),
+      seconds: Math.floor((difference % (1000 * 60)) / 1000),
+    };
+  };
+
+  const [timeLeft, setTimeLeft] = useState(getInitialTimeLeft);
+
+  useEffect(() => {
+    let targetTime = localStorage.getItem(storageKey);
+    if (!targetTime) {
+      const targetDate = new Date();
+      targetDate.setDate(targetDate.getDate() + 30);
+      targetTime = targetDate.getTime().toString();
+      localStorage.setItem(storageKey, targetTime);
+    }
+    const targetTimestamp = parseInt(targetTime, 10);
+
+    const updateTimer = () => {
+      const now = Date.now();
       const difference = targetTimestamp - now;
 
       if (difference <= 0) {
-        clearInterval(interval);
         setTimeLeft({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+        return true; // should clear interval
       } else {
         const days = Math.floor(difference / (1000 * 60 * 60 * 24));
         const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
         const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
         const seconds = Math.floor((difference % (1000 * 60)) / 1000);
         setTimeLeft({ days, hours, minutes, seconds });
+        return false;
+      }
+    };
+
+    // Run once immediately on mount just in case
+    const shouldClear = updateTimer();
+    if (shouldClear) return;
+
+    const interval = setInterval(() => {
+      const shouldClear = updateTimer();
+      if (shouldClear) {
+        clearInterval(interval);
       }
     }, 1000);
 
