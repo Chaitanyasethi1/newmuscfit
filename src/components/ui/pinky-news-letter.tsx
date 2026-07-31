@@ -56,7 +56,7 @@ export default function NewsLetter() {
   }, []);
 
   return (
-    <main className="relative min-h-screen overflow-hidden">
+    <main className="relative min-h-[100dvh] overflow-hidden">
       {/* Background shader */}
       <div className="absolute inset-0">
         <Warp
@@ -75,20 +75,20 @@ export default function NewsLetter() {
         />
       </div>
 
-      {/* Top Left Logo (Zoomed / Made Larger) */}
-      <div className="absolute top-8 left-10 z-20">
+      {/* Top Left Logo (Centered on mobile, left-aligned on desktop) */}
+      <div className="absolute top-8 left-1/2 -translate-x-1/2 md:left-10 md:translate-x-0 z-20 w-auto flex justify-center">
         <img src="/logo.png" alt="Logo" className="h-10 md:h-14 w-auto object-contain transition-all duration-300 hover:scale-105" />
       </div>
 
-      <div className="relative z-10 min-h-screen flex items-center justify-center px-8">
-        <div className="max-w-2xl w-full text-center space-y-8">
+      <div className="relative z-10 min-h-[100dvh] flex items-center justify-center px-6 py-20 md:py-12">
+        <div className="max-w-2xl w-full text-center space-y-6 md:space-y-8 my-auto">
           <div className="space-y-3">
-            <span className="text-white/50 text-xs md:text-sm uppercase tracking-[0.25em] font-medium">Premium Activewear & Gym Gear</span>
-            <h1 className="text-white text-5xl md:text-7xl font-sans font-black uppercase tracking-tight">Forge Your Peak</h1>
+            <span className="text-white/50 text-xs md:text-sm uppercase tracking-[0.25em] font-medium block">Premium Activewear & Gym Gear</span>
+            <h1 className="text-white text-4xl md:text-7xl font-sans font-black uppercase tracking-tight">Forge Your Peak</h1>
           </div>
 
           {/* 30 Days Live Countdown Timer */}
-          <div className="grid grid-cols-4 gap-4 max-w-md mx-auto py-4">
+          <div className="grid grid-cols-4 gap-2 sm:gap-4 max-w-md mx-auto py-2">
             {[
               { label: "Days", value: timeLeft.days },
               { label: "Hours", value: timeLeft.hours },
@@ -97,12 +97,12 @@ export default function NewsLetter() {
             ].map((item, index) => (
               <div
                 key={index}
-                className="flex flex-col items-center justify-center p-3 md:p-4 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-xl transition-all duration-300 hover:scale-105"
+                className="flex flex-col items-center justify-center p-2.5 sm:p-4 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-xl transition-all duration-300 hover:scale-105"
               >
-                <span className="text-white text-3xl md:text-5xl font-extralight tabular-nums leading-none">
+                <span className="text-white text-2xl sm:text-5xl font-extralight tabular-nums leading-none">
                   {String(item.value).padStart(2, "0")}
                 </span>
-                <span className="text-white/40 text-[10px] md:text-xs uppercase tracking-widest mt-2 font-light">
+                <span className="text-white/40 text-[9px] sm:text-xs uppercase tracking-widest mt-1.5 sm:mt-2 font-light">
                   {item.label}
                 </span>
               </div>
@@ -110,16 +110,16 @@ export default function NewsLetter() {
           </div>
 
           {/* Email input with submit button */}
-          <div className="space-y-4">
+          <div className="space-y-4 max-w-lg mx-auto">
             <div className="relative">
               <input
                 type="email"
                 placeholder="Enter your email for early access"
-                className="w-full px-6 py-4 pr-20 text-base md:text-lg bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white/40 transition-all duration-300"
+                className="w-full px-5 py-3.5 pr-16 text-sm md:text-lg bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-white/40 focus:border-white/40 transition-all duration-300"
               />
-              <button className="absolute right-2 top-1/2 -translate-y-1/2 w-12 h-12 bg-white rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300 group">
+              <button className="absolute right-1.5 top-1/2 -translate-y-1/2 w-10 h-10 md:w-12 md:h-12 bg-white rounded-full flex items-center justify-center hover:scale-110 transition-transform duration-300 group">
                 <svg
-                  className="w-5 h-5 text-black group-hover:translate-x-0.5 transition-transform duration-300"
+                  className="w-4 h-4 md:w-5 md:h-5 text-black group-hover:translate-x-0.5 transition-transform duration-300"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -130,7 +130,7 @@ export default function NewsLetter() {
             </div>
 
             {/* Wear preferences for gym wear */}
-            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs md:text-sm text-white/60">
+            <div className="flex flex-col sm:flex-row justify-center items-center gap-y-2.5 sm:gap-y-0 sm:gap-x-6 text-xs text-white/60">
               <label className="flex items-center gap-2 cursor-pointer hover:text-white transition-colors duration-200">
                 <input type="checkbox" className="w-4 h-4 rounded border-white/20 bg-white/5 accent-white cursor-pointer" />
                 <span>Notify me for Men's Wear</span>
@@ -143,7 +143,7 @@ export default function NewsLetter() {
           </div>
 
           {/* Description text */}
-          <p className="text-white/70 text-base md:text-lg font-sans font-light leading-relaxed max-w-lg mx-auto">
+          <p className="text-white/70 text-sm md:text-lg font-sans font-light leading-relaxed max-w-lg mx-auto">
             The next generation of high-performance gym wear is dropping soon.
             Sign up now to get early access to the collection and launch day privileges.
           </p>
@@ -151,8 +151,8 @@ export default function NewsLetter() {
       </div>
 
       {/* Footer text */}
-      <div className="absolute bottom-6 left-0 right-0 z-20 text-center">
-        <p className="text-white/30 text-xs uppercase tracking-[0.2em] font-light">
+      <div className="absolute bottom-4 left-0 right-0 z-20 text-center px-4">
+        <p className="text-white/30 text-[10px] sm:text-xs uppercase tracking-[0.2em] font-light">
           Website by{" "}
           <a
             href="https://kenettechnologies.in"
