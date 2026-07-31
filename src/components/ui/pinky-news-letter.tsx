@@ -149,6 +149,21 @@ export default function NewsLetter() {
           </p>
         </div>
       </div>
+
+      {/* Footer text */}
+      <div className="absolute bottom-6 left-0 right-0 z-20 text-center">
+        <p className="text-white/30 text-xs uppercase tracking-[0.2em] font-light">
+          Website by{" "}
+          <a
+            href="https://kenettechnologies.in"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white/50 hover:text-white transition-colors duration-300 font-medium underline underline-offset-4"
+          >
+            kenettechnologies
+          </a>
+        </p>
+      </div>
     </main>
   )
 }
