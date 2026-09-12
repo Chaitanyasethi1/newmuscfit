@@ -2,8 +2,8 @@ import { useState, useEffect } from "react"
 import { Warp } from "@paper-design/shaders-react"
 import { supabase } from "../../lib/supabaseClient"
 
-// Target date: August 30, 2026 at 22:45:00 UTC (30 days from launch)
-const TARGET_TIMESTAMP = new Date("2026-08-30T22:45:00Z").getTime();
+// Target date: October 12, 2026 at 22:45:00 UTC (30 days from launch)
+const TARGET_TIMESTAMP = new Date("2026-10-12T22:45:00Z").getTime();
 
 export default function NewsLetter() {
   const [email, setEmail] = useState("");
